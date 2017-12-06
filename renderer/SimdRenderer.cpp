@@ -116,10 +116,9 @@ namespace ospray {
           cameraSample.screen.x = du * (1.f / currentFB->size.x);
           cameraSample.screen.y = dv * (1.f / currentFB->size.y);
 
-#if 0
-          cameraSample.lens.x = simd::randUniformDist();
-          cameraSample.lens.y = simd::randUniformDist();
-#endif
+          // TODO: fix correlations / better RNG
+          cameraSample.lens.x = simd::randUniformDist<3>();
+          cameraSample.lens.y = simd::randUniformDist<5>();
 
           auto &ray = screenSample.ray;
           currentCameraN->getRay(cameraSample, ray);

@@ -109,12 +109,13 @@ namespace ospray {
 
       simd::RandomTEA<simd::vint,4> rng((pixel_y * fbWidth) + pixel_x, accumID);
 #endif
-
+      const simd::vec2f rot(1.f - simd::randUniformDist<3>(),
+                            1.f - simd::randUniformDist<5>());
       for (int i = 0; i < samplesPerFrame; i++) {
 #if USE_RANDOMTEA_RNG
-        auto ao_ray = calculateAORay(dg, aoContext, rng);
+        auto ao_ray = calculateAORay(dg, rot, aoContext, rng);
 #else
-        auto ao_ray = calculateAORay(dg, aoContext);
+        auto ao_ray = calculateAORay(dg, rot, aoContext);
 #endif
         ao_ray.t = aoRayLength;
 

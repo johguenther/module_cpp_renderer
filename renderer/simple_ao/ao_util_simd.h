@@ -61,15 +61,13 @@ namespace ospray {
     inline simd::vec3f getRandomDir(const simd::vec3f &biNorm0,
                                     const simd::vec3f &biNorm1,
                                     const simd::vec3f &gNormal,
+                                    const simd::vec2f &rot,
                                     float epsilon)
     {
-      const auto rot_x = 1.f - simd::randUniformDist<3>();
-      const auto rot_y = 1.f - simd::randUniformDist<5>();
-
       const auto rn = simd::vec2f{simd::randUniformDist<2>(),
                                   simd::randUniformDist<2>()};
-      const auto r0 = rotate(rn.x, rot_x);
-      const auto r1 = rotate(rn.y, rot_y);
+      const auto r0 = rotate(rn.x, rot.x);
+      const auto r1 = rotate(rn.y, rot.y);
 
       const auto w = simd::sqrt(1.f-r1);
       const auto x = simd::cos((2.f*simd::vfloat{M_PI}*r0))*w;
@@ -84,14 +82,13 @@ namespace ospray {
                                     const simd::vec3f &biNorm0,
                                     const simd::vec3f &biNorm1,
                                     const simd::vec3f &gNormal,
+                                    const simd::vec2f &rot,
                                     float epsilon)
     {
-      const auto rot_x = 1.f - simd::randUniformDist<3>();
-      const auto rot_y = 1.f - simd::randUniformDist<5>();
       const auto rn = rng.getFloats();
 
-      const auto r0 = rotate(rn.x, rot_x);
-      const auto r1 = rotate(rn.y, rot_y);
+      const auto r0 = rotate(rn.x, rot.x);
+      const auto r1 = rotate(rn.y, rot.y);
 
       const auto w = simd::sqrt(1.f-r1);
       const auto x = simd::cos((2.f*simd::vfloat{M_PI}*r0))*w;
@@ -101,11 +98,12 @@ namespace ospray {
     }
 
     inline RayN calculateAORay(const DifferentialGeometryN &dg,
+                               const simd::vec2f &rot,
                                const ao_contextN &ctx)
     {
       RayN ao_ray;
       ao_ray.org = dg.P + (simd::vfloat{1e-3f} * dg.Ns);
-      ao_ray.dir = getRandomDir(ctx.biNormU, ctx.biNormV, dg.Ns, ctx.epsilon);
+      ao_ray.dir = getRandomDir(ctx.biNormU, ctx.biNormV, dg.Ns, rot, ctx.epsilon);
       ao_ray.t0  = ctx.epsilon;
       ao_ray.t   = ctx.rayLength - ctx.epsilon;
       return ao_ray;
@@ -114,13 +112,14 @@ namespace ospray {
     // NOTE(jda) - RandomTEA variant of calculateAORay()
     template <typename RANDOM_TEA_T>
     inline RayN calculateAORay(const DifferentialGeometryN &dg,
+                               const simd::vec2f &rot,
                                const ao_contextN &ctx,
                                RANDOM_TEA_T &rng)
     {
       RayN ao_ray;
       ao_ray.org = dg.P + (simd::vfloat{1e-3f} * dg.Ns);
       ao_ray.dir = getRandomDir(rng, ctx.biNormU, ctx.biNormV,
-                                dg.Ns, ctx.epsilon);
+                                dg.Ns, rot, ctx.epsilon);
       ao_ray.t0  = ctx.epsilon;
       ao_ray.t   = ctx.rayLength - ctx.epsilon;
       return ao_ray;
